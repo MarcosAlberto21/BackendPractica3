@@ -23,6 +23,7 @@ describe('Base de datos', function () {
   });
 });
 
+
 describe('Login', function () {
   it('Login exitoso', function () {
     mysqlConnection.query('SELECT * FROM Usuario WHERE username = ? AND contrasenia=?'
