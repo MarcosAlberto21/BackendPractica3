@@ -17,10 +17,10 @@ router.get('/user',(req,res) => {
 
 //ingresar usuario
 router.post('/user', (req, res) => {
-    const { username, contrasenia,nombre,apellido,dpi,edad} = req.body;
-    const val=[ username, contrasenia,nombre,apellido,dpi,edad];
+    const { username,correo, contrasenia,nombre,apellido,dpi,edad,id_tipousuario} = req.body;
+    const val=[ username,correo, contrasenia,nombre,apellido,dpi,edad,id_tipousuario];
     console.log(val);
-    const query = `INSERT INTO Usuario(username, contrasenia,nombre,apellido,dpi,edad) VALUES (?,?,?,?,?,?)`;
+    const query = `INSERT INTO Usuario(username, correo, contrasenia,nombre,apellido,dpi,edad,id_tipousuario) VALUES (?,?,?,?,?,?,?,?)`;
     
     mysqlConnection.query(query, val, (err, rows, fields) => {
       if(!err) {
