@@ -38,3 +38,19 @@ describe('Login', function () {
     assert.strictEqual([1, 2, 3].indexOf(4), -1);
   });
 });
+
+
+describe('giftcard', function () {
+  it('historial', function () {
+    mysqlConnection.query('SELECT * FROM Usuario WHERE username = ? AND contrasenia=?'
+                          ,['user1','123'], (err, rows, fields) => {
+      if(!err) {
+        const usuario=rows[0];
+        assert.notStrictEqual(usuario,undefined);
+      } else {
+        console.log(err);
+      }
+    });  
+    assert.strictEqual([1, 2, 3].indexOf(4), -1);
+  });
+});
