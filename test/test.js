@@ -6,7 +6,8 @@ let chaiHttp = require('chai-http');
 const expect = require('chai').expect;
 
 chai.use(chaiHttp);
-const url= 'http://localhost:3000';
+const PORT = process.env.PORT || 3000;
+const url= `http://localhost:${PORT}`;
 
 describe('Array', function () {
   describe('#indexOf()', function () {
