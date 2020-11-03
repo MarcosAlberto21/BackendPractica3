@@ -3,54 +3,95 @@ const express = require('express');
 const router = express.Router();
 const mysqlConnection  = require('../database.js');
 const {generarAlfanumerico}  = require('../utils');
+const giftcardService  = require('../services/giftcard');
 
 //obtener todos los usuarios
-router.post('/giftcard/historial',(req,res) => {
+router.post('/giftcard/historial', async (req,res) => {
     let idusuario = req.body.idusuario.id_usuario;
     let items = req.body.items;
     let pago = req.body.pago;
-    mysqlConnection.query('SELECT * FROM TipoGiftcard', (err, tipogiftcards, fields) => {
-        if(!err) {
-          items.map((obj)=>{
-            let existe = tipogiftcards.filter((tipo)=>tipo.id_tipogiftcard==obj.giftcard.id);
-            if(!existe){
-              let valuesTipoGiftcard = [obj.giftcard.id,  obj.giftcard.name, obj.giftcard.image, obj.giftcard.chargeRate, obj.giftcard.active];
-              mysqlConnection.query('Insert into TipoGiftcard (id_tipogiftcard,nombre, image, chargerate, active) values (?,?,?,?,?)', valuesTipoGiftcard, (err, newtipogiftcard, fields) => {
-                if(!err) {
-                  var id = generarAlfanumerico();
-                  let valuesGiftcard = [id, obj.giftcard.id,  obj.giftcardValue.id, idusuario];
-                  mysqlConnection.query('Insert into Giftcard (id_giftcard,id_tipogiftcard,id_valor,id_usuario) values (?,?,?,?)', valuesGiftcard, (err, newgiftcard, fields) => {
-                    if(!err) {
-                      //exito
-                    } else {
-                      console.log(err);
-                      res.status(409).send({ message: 'Problema al guardar Giftcard.' });
-                    }
-                  });  
-                } else {
-                  console.log(err);
-                  res.status(409).send({ message: 'Problema al guardar TipoGiftcards.' });
-                }
-              });  
-            }else{
+    console.log("idusuario",idusuario);
+    console.log("items",items);
+    console.log("pago",pago);
+
+    let result = [];
+    try{
+      //Obtener todos los tipos giftcard existentes
+      let tipogiftcards = await giftcardService.getTiposGiftCard();
+      console.log("tipogiftcards",tipogiftcards);
+      //Recorrer items comprados y verificar si ya existen en base de datos
+      const asyncRes = await Promise.all(items.map(async (obj)=>{
+        let existe = tipogiftcards.filter((tipo)=>tipo.id_tipogiftcard==obj.giftcard.id);
+        console.log("existe",existe);
+        if(!existe.length>0){
+          //Si no existe crear tipo giftcard
+          let valuesTipoGiftcard = [obj.giftcard.id,  obj.giftcard.name, obj.giftcard.image, obj.giftcard.chargeRate, obj.giftcard.active];
+          let newtipogiftcard = await giftcardService.insertTiposGiftCard(valuesTipoGiftcard);
+          console.log("newtipogiftcard",newtipogiftcard);
+          if(!!newtipogiftcard){
+            //Al crear nuevo tipo giftcard
+              //Crear valor si no existe
+              let valores = await giftcardService.getValores();
+              console.log("valores",valores);
+              let existeValor = valores.filter((valor)=>valor.id_valor==obj.giftcardValue.id);
+              console.log("existeValor",existeValor);
+              if(!existeValor.length>0){
+                let valuesValor = [obj.giftcardValue.id, obj.giftcardValue.total];
+                let newValor= await giftcardService.insertValor(valuesValor);
+                console.log("newValor",newValor);
+              }
+
+            //Crear tipo giftcard valor
+            let valuesGiftcardValor = [obj.giftcard.id,  obj.giftcardValue.id];
+            let giftcardValor = await giftcardService.insertGiftCardValor(valuesGiftcardValor);
+            console.log("giftcardValor",giftcardValor);
+
+            if(!!giftcardValor){
+              //Asociar tipo giftcard a usuario
               var id = generarAlfanumerico();
               let valuesGiftcard = [id, obj.giftcard.id,  obj.giftcardValue.id, idusuario];
-              mysqlConnection.query('Insert into Giftcard (id_giftcard,id_tipogiftcard,id_valor,id_usuario) values (?,?,?,?)', valuesGiftcard, (err, newgiftcard, fields) => {
-                if(!err) {
-                  //exito
-                } else {
-                  console.log(err);
-                  res.status(409).send({ message: 'Problema al guardar Giftcard.' });
-                }
-              });  
+              let newgiftcard = await giftcardService.insertGiftCard(valuesGiftcard);
+              console.log("newgiftcard",newgiftcard);
+              return obj;
+            }else{
+              throw new Error("No insertGiftCardValor")
             }
-          });
-          res.status(200).json({status: 'ok'});
-        } else {
-          console.log(err);
-          res.status(409).send({ message: 'Problema al obtener TipoGiftcards.' });
+          }else{
+            throw new Error("No insertTiposGiftCard")
+          }
+        }else{
+          //Actualizar valores de tipoGiftcard
+          let valuesTipoGiftcard = [obj.giftcard.name, obj.giftcard.image, obj.giftcard.chargeRate, obj.giftcard.active, obj.giftcard.id];
+          let newtipogiftcard = await giftcardService.updateTiposGiftCard(valuesTipoGiftcard);
+          console.log("newtipogiftcard",newtipogiftcard);
+
+          //Crear valor si no existe
+          let valores = await giftcardService.getValores();
+          console.log("valores1",valores);
+          let existeValor = valores.filter((valor)=>valor.id_valor==obj.giftcardValue.id);
+          console.log("existeValor1",existeValor);
+          if(!existeValor.length>0){
+            let valuesValor = [obj.giftcardValue.id, obj.giftcardValue.total];
+            let newValor= await giftcardService.insertValor(valuesValor);
+            console.log("newValor1",newValor);
+
+            //Crear tipo giftcard valor
+            let valuesGiftcardValor = [obj.giftcard.id,  obj.giftcardValue.id];
+            let giftcardValor = await giftcardService.insertGiftCardValor(valuesGiftcardValor);
+            console.log("giftcardValor1",giftcardValor);
+          }
+
+          var id = generarAlfanumerico();
+          let valuesGiftcard = [id, obj.giftcard.id,  obj.giftcardValue.id, idusuario];
+          let newgiftcard = await giftcardService.insertGiftCard(valuesGiftcard);
+          console.log("newgiftcard1",newgiftcard);
+          return obj;
         }
-    });  
+      }));
+      res.status(200).send({ message: 'ok', data: items});
+    }catch(e){
+      res.status(500).send({ message: 'Problema al guardar historial.', data: e});
+    }    
 });
 
 
