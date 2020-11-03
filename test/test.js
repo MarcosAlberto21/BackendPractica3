@@ -37,7 +37,7 @@ describe('Login', function () {
   it('Login exitoso', function () {
     chai.request(url)
       .post('/login')
-      .send({ username:'user2', contrasenia: '123' })
+      .send({ correo:'user2', contrasenia: '123' })
       .end( function(err,res){
          
           if(err){
@@ -54,7 +54,7 @@ describe('Login', function () {
   it('Login fallido', function () {
     chai.request(url)
       .post('/login')
-      .send({ username:'userIncorrecto', contrasenia: '123' })
+      .send({ correo:'userIncorrecto', contrasenia: '123' })
       .end( function(err,res){
          
           if(err){
