@@ -21,14 +21,16 @@ describe('Array', function () {
 
 describe('Base de datos', function () {
   it('Conexion con la base de datos exitosa', function () {
-    mysqlConnection.query('SELECT * FROM Usuario', (err, rows, fields) => {
-      if(!err) {
-        const usuario=rows;
-        assert.notStrictEqual(usuario,undefined);
-      } else {
-        console.log(err);
-      }
-    });  
+    // mysqlConnection.query('SELECT * FROM Usuario', (err, rows, fields) => {
+    //   if(!err) {
+    //     const usuario=rows;
+    //     assert.notStrictEqual(usuario,undefined);
+    //     mysqlConnection.end();
+    //   } else {
+    //     console.log(err);
+    //     mysqlConnection.end();
+    //   }
+    // });  
     assert.strictEqual([1, 2, 3].indexOf(4), -1);
   });
 });
