@@ -1,5 +1,6 @@
 var assert = require('assert');
 const mysqlConnection  = require('../src/database');
+const {generarAlfanumerico, enamascararTarjeta}  = require('../src/utils');
 
 let chai = require('chai');
 let chaiHttp = require('chai-http');
@@ -107,7 +108,21 @@ describe('Registro', function () {
   
 });
 
+//login
+describe('Utils', function () {
 
+  it('Should generate alfanumeric 8 character text', function () {
+    let texto = generarAlfanumerico();
+    assert.strictEqual(8,texto.length);
+  });
+
+  it('Should mask card number', function () {
+    let cc = '1234567891011121';
+    let texto = enamascararTarjeta(cc);
+    assert.strictEqual('1234########1121',texto);
+  });
+
+})
 
 /*
 describe('giftcard', function () {
