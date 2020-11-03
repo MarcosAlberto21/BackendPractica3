@@ -8,7 +8,7 @@ const expect = require('chai').expect;
 
 chai.use(chaiHttp);
 const PORT = process.env.PORT || 3000;
-const url= `http://localhost:${PORT}`;
+const url= require('../src/index');
 
 describe('Array', function () {
   describe('#indexOf()', function () {
