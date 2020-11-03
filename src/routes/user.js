@@ -63,10 +63,10 @@ router.post('/user', (req, res) => {
 
 //login res.status(200).send({ dataU });
 router.post('/login', (req, res) => {
-    const { username, contrasenia} = req.body;
-    const val=[ username, contrasenia];
+    const { correo, contrasenia} = req.body;
+    const val=[ correo, contrasenia];
     console.log(val);
-    const query = `SELECT * FROM Usuario WHERE username = ? AND contrasenia=?`;
+    const query = `SELECT * FROM Usuario WHERE correo = ? AND contrasenia=?`;
     
     mysqlConnection.query(query, val, (err, rows, fields) => {
       if(!err) {
@@ -82,4 +82,30 @@ router.post('/login', (req, res) => {
       }
     });
 });
+
+
+router.get('/catalogo',(req,res) => {
+  const { id }=req.params;
+  mysqlConnection.query('SELECT * FROM TipoGiftcard',id, (err, rows, fields) => {
+      if(!err) {
+        res.status(200).json(rows);
+      } else {
+        console.log(err);
+        res.status(409).send({ message: 'Problema al solicitar catalogo.' });
+      }
+    });  
+});
+
+router.get('/detallecompras',(req,res) => {
+  const { id }=req.params;
+  mysqlConnection.query('SELECT * FROM DetalleFactura inner join Factura on DetalleFactura.id_factura=Factura.id_factura inner join Usuario on Factura.id_usuario=Usuario.id_usuario inner join Giftcard on DetalleFactura.id_giftcard=Giftcard.id_giftcard inner join TipoGiftcard on Giftcard.id_tipogiftcard = TipoGiftcard.id_tipogiftcard',id, (err, rows, fields) => {
+      if(!err) {
+        res.status(200).json(rows);
+      } else {
+        console.log(err);
+        res.status(409).send({ message: 'Problema al solicitar detalles de compras.' });
+      }
+    });  
+});
+
 module.exports = router;
