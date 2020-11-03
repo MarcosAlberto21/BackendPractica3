@@ -65,8 +65,9 @@ router.post('/user', (req, res) => {
 router.post('/login', (req, res) => {
     const { correo, contrasenia} = req.body;
     const val=[ correo, contrasenia];
-    console.log(val);
-    const query = `SELECT * FROM Usuario WHERE correo = ? AND contrasenia=?`;
+    console.log(val);    
+    const enviar = correo.includes('@')?"correo":"username";
+    const query = `SELECT * FROM Usuario WHERE ${enviar} = ? AND contrasenia=?`;
     
     mysqlConnection.query(query, val, (err, rows, fields) => {
       if(!err) {
