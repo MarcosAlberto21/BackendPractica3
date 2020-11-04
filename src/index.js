@@ -15,8 +15,12 @@ app.get('/', (req,res) => {
 });
 
 app.use(require('./routes/user'));
+app.use(require('./routes/giftcard'));
+app.use(require('./routes/inventarios_compras'));
 
 //conexión con la base de datos
 app.listen(PORT, () =>{
     console.log(`Server running on port ${PORT}`);
 });
+
+module.exports = app;

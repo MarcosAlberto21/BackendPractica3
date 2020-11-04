@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "mocha",
+    "test": "mocha --exit",
     "dev": "nodemon src/index.js"
   },
   "repository": {
@@ -20,6 +20,7 @@
   "homepage": "https://github.com/MarcosAlberto21/BackendPractica3#readme",
   "dependencies": {
     "cors": "^2.8.5",
+    "crypto": "^1.0.1",
     "express": "^4.17.1",
     "morgan": "^1.10.0",
     "mysql": "^2.18.1"
